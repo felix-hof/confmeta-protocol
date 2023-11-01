@@ -12,4 +12,4 @@ clean:
 cleanall:
 	latexmk -C
 
-.PHONY: preview
+.PHONY: all preview clean cleanall
