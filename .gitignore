@@ -1,0 +1,11 @@
+# Intermediate files from latexmk
+*\.aux
+*\.bbl
+*\.blg
+*\.brf
+*\.fdb_latexmk
+*\.fls
+*\.log
+*\.out
+*\.pdf
+*\.toc
