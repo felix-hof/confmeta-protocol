@@ -1,4 +1,4 @@
-\documentclass[letterpaper, 9pt]{article}
+\documentclass[letterpaper, 12pt]{article}
 %\usepackage[nomarkers]{endfloat} %%%%%%%%%
 \usepackage{calc}
 \usepackage{color}
@@ -12,7 +12,7 @@
 \floatstyle{plaintop}
 \restylefloat{listing}
  
-%\usepackage{natbib}
+\usepackage{natbib}
 %\usepackage{multind}
 \usepackage{booktabs}
 \usepackage{enumerate}
@@ -24,14 +24,12 @@
 %% \linenumber
 \renewcommand{\baselinestretch}{1}  %% 2
 
-\usepackage{natbib}
-
 \usepackage{color,xcolor}
 \definecolor{link}{HTML}{004C80}
 
 \usepackage[labelfont=bf]{caption}
 \usepackage[english]{babel}
-\usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref=true,colorlinks=true, citecolor=link,linkcolor=link]{hyperref}
+\usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref=true,colorlinks=true,citecolor=link,linkcolor=link]{hyperref}
 \hypersetup{colorlinks,urlcolor=link}
 \usepackage{array, lipsum}
 
@@ -67,17 +65,14 @@
     uncertainty of the combined estimate of a meta-analysis
   }\\
 \bigskip
-{\noindent \Large Florian Gerber, Leonhard Held, Lisa Hofer, Felix Hofmann, Philip Heesen
+{\noindent \Large Leonhard Held, Felix Hofmann
 }\end{center}
 \bigskip
 \vspace*{.5cm}
 
-
 For the present protocol is inspired by \citet{burt:etal:06} and \citet{morr:etal:19}.
 
-
 The simulation is implemented in \texttt{simulate\_all.R}.
-
 
 \tableofcontents
 
@@ -85,33 +80,14 @@ The simulation is implemented in \texttt{simulate\_all.R}.
 
 \section{Aims and objectives}\label{ref:aims}
 
-% TODO:
-% Add paragraph for distribution of the test statistic (F and Chi-square) for harmonic mean methods (or did we decide to ditch the F-distribution?)
-% Standard REML is missing (DONE)
-% Add k-Trials (DONE)
-%\color{red}
-%Changes to the last version:
-%\begin{itemize}
-%\color{red}
- %\item The protocol mentioned the DerSimonian-Laird method to construct confidence intervals. However, there is no method called ``DerSimonian-Laird'' in the simulation. The paper indicates that this also uses a random effects model with REML. Is this the same as the method called ``REML'' that we already have in the simulation?
- %\item Removed harmonic mean with alternative \texttt{two.sided}
- %\item Added entries for k-Trials rule
-% \item Added a subsection about the distribution of the minimum of the p-value function in ``Aims and objectives''
- %\item Updated criteria for evaluation of CIs
- %\item Updated number of studies $k$
- %\end{itemize} 
- 
- %\vspace*{.5cm}
- 
-%Notes:
- %\begin{itemize}
- %\color{red}
- % \item{Should we mention that we tried F-distribution for the harmonic mean test statistic?}
- %\end{itemize}
-%\color{black}
-
-The aim of this simulation study is the comparison of confidence intervals (CIs) summarizing the uncertainty of the combined estimate of a meta-analysis. Specifically, we focus on CIs constructed using the harmonic mean method, which is described in \citet{Held2020b}, and the $k$-trials rule, which is defined in Subsection~\ref{sec:ktrial}. The underlying data sets are simulated as described in Section~\ref{sec:simproc} and Section~\ref{sec:scenario}. The resulting intervals are then compared to CIs constructed using the other methods listed in Section~\ref{sec:method} using the measures defined in Section~\ref{sec:meas}.
-
+The aim of this simulation study is the comparison of confidence intervals
+(CIs) summarizing the uncertainty of the combined estimate of a meta-analysis.
+Specifically, we focus on CIs constructed using p-value functions that
+implement the methods from \citet{edgington:72} and \citet{fisher:34}. The
+underlying data sets are simulated as described in Section~\ref{sec:simproc}
+and Section~\ref{sec:scenario}. The resulting intervals are then compared to CIs
+constructed using the other methods listed in Section~\ref{sec:method} using the
+measures defined in Section~\ref{sec:meas}.
 
 \section{Simulation of the data sets} \label{sec:simproc}
 
