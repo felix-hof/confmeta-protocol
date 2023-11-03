@@ -19,7 +19,7 @@
 \usepackage{todonotes}
 % \usepackage{uarial}
 % \renewcommand{\familydefault}{\sfdefault}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% to change %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% to change %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% \usepackage{lineno}
 %% \linenumber
 \renewcommand{\baselinestretch}{1}  %% 2
@@ -29,7 +29,15 @@
 
 \usepackage[labelfont=bf]{caption}
 \usepackage[english]{babel}
-\usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref=true,colorlinks=true,citecolor=link,linkcolor=link]{hyperref}
+\usepackage[
+  pdftex,
+  plainpages=false,
+  pdfpagelabels,
+  pagebackref=true,
+  colorlinks=true,
+  citecolor=link,
+  linkcolor=link
+]{hyperref}
 \hypersetup{colorlinks,urlcolor=link}
 \usepackage{array, lipsum}
 
@@ -92,160 +100,249 @@ measures defined in Section~\ref{sec:meas}.
 \section{Simulation of the data sets} \label{sec:simproc}
 
 \subsection{Allowance for failures}
-We expect no failures, \ie, for all simulated data sets all type of CI methods should lead to a valid CI and all valid CIs should lead to valid CI criteria.
-If a failure occurs, we stop the simulation and investigate the reason for the failure. 
+We expect no failures, \ie, for all simulated data sets all type of CI methods
+should lead to a valid CI and all valid CIs should lead to valid CI criteria.
+If a failure occurs, we stop the simulation and investigate the reason for the
+failure. 
 
 \subsection{Software to perform simulations}
 The simulation study is performed using the statistical software R \citep{R}.
-We save the output of \texttt{sessionInfo()} giving information on the used version of R, packages, and platform with the simulation results.
+We save the output of \texttt{sessionInfo()} giving information on the used
+version of R, packages, and platform with the simulation results.
 
 \subsection{Random number generator}
-We use the package \pkg{doRNG} with its default random number generator to ensure that random numbers generated inside parallel for loops are independent and reproducible.
+We use the package \pkg{doRNG} with its default random number generator to
+ensure that random numbers generated inside parallel for loops are independent
+and reproducible.
 
 
 \subsection{Scenarios to be investigated} \label{sec:scenario}
-The $720$ simulated scenarios consist of all combinations of the following parameters:
+The $720$ \todo{update number} simulated scenarios consist of all combinations
+of the following parameters:
 \begin{itemize}
 \item Higgin's $I^2$ heterogeneity measure $\in \{0, 0.3, 0.6, 0.9\}$.
-\item Heterogeneity model $\in \{\text{'additive'}, \text{'multiplicative'}\}$.
+\item We always use an additive heterogeneity model. \todo{Maybe remove this entirely?}
 \item Number of studies summarized by the meta-analysis $k \in \{3, 5, 10, 20, 50\}$.
-\item Publication bias is  $\in \{\text{'none'}, \text{'moderate'}, \text{strong'}\}$ following the terminology of \citet{henm:copa:10}.
-  The average study effect also influences the publication bias, and we set it to $\theta = 0.2$ to obtain a similar scenario as used in \citet{henm:copa:10}.
-\item The distribution to draw the true study values $\delta_i$ is either 'Gaussian' or 't' with 4 degrees of freedom. The latter still has finite mean and variance, but leads to more 'outliers'.
-\item The sample size $n_i$ of the $i$-th study (number of patients per study) is $n_i = 50$ (small study) except for 0, 1, or 2 studies where $n_i=500$ (large study). 
+\item Publication bias is  $\in \{\text{'none'}, \text{'moderate'}, \text{'strong'}\}$
+  following the terminology of \citet{henm:copa:10}. 
+\item The average study effect $\theta \in \{0.2, 0.5\}$. 
+  %, and we set it to $\theta = 0.2$ to
+  %obtain a similar scenario as used in \citet{henm:copa:10}.
+\item The distribution to draw the true study values $\delta_i$ is either
+  'Gaussian' or 't' with 4 degrees of freedom. The latter still has finite mean
+    and variance, but leads to more 'outliers'.
+\item The sample size $n_i$ of the $i$-th study (number of patients per study)
+  is $n_i = 50$ (small study) except for 0, 1, or 2 studies where
+  $n_i=500$ (large study). 
 \end{itemize}
+
 Note that \citet{IntHoutIoannidis} use a similar setup.
 
 \subsection{Simulation details}
 
-For the \textbf{Additive heterogeneity model without publication bias}, the simulation of one meta-analysis dataset is performed as follows:
+% For the \textbf{Additive heterogeneity model without publication bias}, the
+% simulation of one meta-analysis dataset is performed as follows:
+The simulation of one meta-analysis data set is performed as follows:
+
 \begin{enumerate}
-\item Compute the within-study variance $\epsilon^2 = \frac{2}{k} \sum\limits_{i=1}^k \frac{1}{n_i}$.
+\item Compute the within-study variance
+  \begin{equation} \label{eq:eps2}
+    \epsilon^2 = \frac{2}{k} \sum\limits_{i=1}^k \frac{1}{n_i}.
+  \end{equation}
 \item Compute the between-study variance
   \begin{equation}\label{eq:eq1}
     \tau^2 = \epsilon^2 \frac{I^2}{1-I^2}.
-\end{equation}
-\item For a trial $i$ of the meta-analysis with $k$ trials, $i = 1, \dots, k$:
-  \begin{enumerate}
-  \item Simulate the true effect size using the Gaussian model: $\delta_i \sim \N(\theta, \tau^2)$ or using a Student-$t$ distribution with 4 degrees of freedom such that the samples have mean $\theta$ and variance $\tau^2$.
-  \item Simulate the effect estimates of each trial $y_i \sim \N(\delta_i, \frac{2}{n_i})$.
-  \item Simulate the standard errors of the trial outcomes: $\text{se}_i \sim \sqrt{\frac{\chi^2(2n_i-2)}{(n_i-1)n_i}}$.
-  \end{enumerate}
-
-\paragraph{Note: The marginal variance}\mbox{}\\
-The marginal variance of this simulation procedure is
-$\tau^2 + 2/n$, so follows the additive model as intended.
-\end{enumerate}
-For the \textbf{Multiplicative model without publication bias}, the simulation of one meta-analysis dataset is performed as follows:
-\begin{enumerate}
-\item Compute the within-study variance $\epsilon^2 = \frac{2}{k} \sum\limits_{i=1}^k \frac{1}{n_i}$.
-  \item Compute the multiplicative heterogeneity factor $\phi = \frac{1}{1-I^2}$. Compute the corresponding
-  \begin{equation}\label{eq:eq2}
-    \tau^2 = \epsilon^2 \, (\phi-1) .
   \end{equation}
 \item For a trial $i$ of the meta-analysis with $k$ trials, $i = 1, \dots, k$:
   \begin{enumerate}
-  \item Simulate the true effect size using the Gaussian model: $\delta_i \sim \N(\theta, \tau^2)$ or using a Student-$t$ distribution such that the samples have mean $\theta$ and variance $\tau^2$.
-  \item Simulate the effect estimates of each trial $y_i \sim \N(\delta_i, \frac{2}{n_i})$.
-  \item Simulate the standard errors of the trial outcomes: $\text{se}_i \sim \sqrt{\frac{\chi^2(2n_i-2)}{(n_i-1)n_i}}$.
+    \item Simulate the true effect size using the Gaussian model:
+      $\delta_i \sim \N(\theta, \tau^2)$ or using a Student-$t$ distribution
+      with 4 degrees of freedom such that the samples have mean $\theta$ and
+      variance $\tau^2$.
+    \item Simulate the effect estimates of each trial
+      $y_i \sim \N(\delta_i, \frac{2}{n_i})$.
+    \item Simulate the standard errors of the trial outcomes:
+      $\text{se}_i \sim \sqrt{\frac{\chi^2(2n_i-2)}{(n_i-1)n_i}}$.
   \end{enumerate}
-  \end{enumerate}
-
+\end{enumerate}
 
 \paragraph{Note: The marginal variance}\mbox{}\\
 The marginal variance of this simulation procedure is
-$\frac{2}{n} \, (\phi-1) + \frac{2}{n} = \frac{2\phi}{n} = \phi \, \epsilon^2$, so follows the multiplicative
-model as intended.
+$\tau^2 + 2/n_i$, so follows the additive heterogeneity model as intended.
 
+% For the \textbf{Multiplicative model without publication bias}, the simulation
+% of one meta-analysis dataset is performed as follows:
+% \begin{enumerate}
+% \item Compute the within-study variance
+%   $\epsilon^2 = \frac{2}{k} \sum\limits_{i=1}^k \frac{1}{n_i}$.
+%   \item Compute the multiplicative heterogeneity factor
+%     $\phi = \frac{1}{1-I^2}$. Compute the corresponding
+%     \begin{equation}\label{eq:eq2}
+%       \tau^2 = \epsilon^2 \, (\phi-1) .
+%     \end{equation}
+% \item For a trial $i$ of the meta-analysis with $k$ trials, $i = 1, \dots, k$:
+%   \begin{enumerate}
+%     \item Simulate the true effect size using the Gaussian model:
+%       $\delta_i \sim \N(\theta, \tau^2)$ or using a Student-$t$ distribution
+%       such that the samples have mean $\theta$ and variance $\tau^2$.
+%     \item Simulate the effect estimates of each trial
+%       $y_i \sim \N(\delta_i, \frac{2}{n_i})$.
+%     \item Simulate the standard errors of the trial outcomes:
+%       $\text{se}_i \sim \sqrt{\frac{\chi^2(2n_i-2)}{(n_i-1)n_i}}$.
+%   \end{enumerate}
+% \end{enumerate}
+%
+%
+% \paragraph{Note: The marginal variance}\mbox{}\\
+% The marginal variance of this simulation procedure is
+% $\frac{2}{n} \, (\phi-1) + \frac{2}{n} = \frac{2\phi}{n} = \phi \, \epsilon^2$,
+% so follows the multiplicative model as intended.
 
 \paragraph{Note: Publication bias}\mbox{}\\
-To simulate studies under \textbf{publication bias}, we follow the suggestion of \citet{henm:copa:10} and accept each simulated study with probability
-$$\exp(-4\, \Phi(-y_i / \text{se}_i)^\gamma ),$$
-where $\gamma = 3$ and $\gamma = 1.5$ correspond to \emph{moderate} and \emph{strong} publication bias, respectively.
-This is, accepted studies are kept and for a rejected study we replace $y_i$ and $\text{se}_i$ by newly simulated values, which are then again accepted with the given probability above.
-This procedure is repeated until the required number of studies is simulated. 
+To simulate studies under \textbf{publication bias}, we follow the suggestion
+of \citet{henm:copa:10} and accept each simulated study with probability
+\begin{equation} \label{eq:pbias}
+\exp(-4\, \Phi(-y_i / \text{se}_i)^\gamma ),
+\end{equation}
+where $\gamma = 3$ and $\gamma = 1.5$ correspond to \emph{moderate} and
+\emph{strong} publication bias, respectively.
+This is, accepted studies are kept and for a rejected study we replace $y_i$
+and $\text{se}_i$ by newly simulated values, which are then again accepted
+with the given probability above. This procedure is repeated until the required
+number of studies is simulated. 
 
-The mean study effect $\theta$ and the sample size $n_i$ have an influence on the acceptance probability.
 To obtain a similar scenario as in \citet{henm:copa:10} we set
-$$ \theta / \sqrt{2/n_i}  \overset{!}{=} 1 \Rightarrow \theta = \sqrt{2/n_i}$$
-However, we assume that only small studies with $n_i = 50$ are subject to publication bias. Thus, larger studies with $n_i = 500$ are always accepted. For the effect size, we set $\theta = 0.2$
-See the R function \texttt{simREbias()}.
+$$
+\theta / \sqrt{2/n_i}  \overset{!}{=} 1 \Rightarrow \theta = \sqrt{2/n_i}
+\vadjust{\todo{Where does this come from? Does this still apply when $\theta =
+0.5$?}}
+$$
+However, we assume that only small studies with $n_i = 50$ are subject to
+publication bias. Thus, larger studies with $n_i = 500$ are always accepted.
+As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.2, 0.5\}$. See the R function \texttt{simREbias()}.
 
+% The mean study effect $\theta$ and the sample size $n_i$ have an influence
+% on the acceptance probability 
 
 % \paragraph{Note: Unbalanced sample sizes}\mbox{}\\
-% To study the effect of unbalanced sample sizes $n_1, \ldots, n_k$ we consider the following setup:
+% To study the effect of unbalanced sample sizes $n_1, \ldots, n_k$ we consider
+% the following setup:
 % \begin{enumerate}
 % \item Increase the sample size of \textbf{one} of the $k$ by a factor 10. 
 % \item Increase the sample size of \textbf{two} of the $k$ by a factor 10. 
 % \end{enumerate}
 %% See the argument \texttt{large} of \texttt{simREbias()}.
 
-
-
 \subsection{Simulation procedure}
 For each scenario in Section~\ref{sec:scenario} we
 \begin{enumerate}
-\item simulate 10'000 meta-analysis datasets
+\item simulate 10'000 meta-analysis data sets
 \item compute the CIs listed in Section~\ref{sec:method} for each meta-analysis
-\item summarize the performance of the CIs by the criteria listed in Section~\ref{sec:meas}
+\item summarize the performance of the CIs by the criteria listed in
+  Section~\ref{sec:meas}
 \end{enumerate}
 
 \section{Analysis of the confidence intervals}
 
-This section contains an overview over the construction methods for CIs that we consider in this simulation. Moreover, we explain what measures we use in order to compare the different CIs with each other.
+This section contains an overview over the construction methods for CIs
+that we consider in this simulation. Moreover, we explain what measures we
+use in order to compare the different CIs with each other.
 
 \subsection{Construction methods for confidence intervals} \label{sec:method}
 
 For this project, we will calculate 95\% CIs according to the following methods.
 
 \begin{enumerate}
-\item Hartung Knapp Sidik Jonkman (HK) \citep{IntHoutIoannidis}. % Check
-\item Random effects model (with REML estimate of the heterogeneity variance). %Check
-\item Henmi and Copas (HC) \citep{henm:copa:10}. % Check
-\item Harmonic mean analysis with alternative \texttt{none} \citep{Held2020b} and without variance adjustment. % Check
-% \item Harmonic mean analysis with alternative {\texttt two.sided} \cite{Held2020b} % This was also thrown out
-\item Harmonic mean analysis with alternative \texttt{none}, additive variance adjustment with $\hat \tau^2$. An extension of the idea in \citet{Held2020b}. 
-\item Harmonic mean analysis with alternative \texttt{none}, multiplicative variance adjustment \citep{mawd:etal:17}.
-\item $k$-trials rule with alternative \texttt{none} and without variance adjustment.
-\item $k$-trials rule with alternative \texttt{none}, additive variance adjustment with $\hat \tau^2$. 
-\item $k$-trials rule with alternative \texttt{none}, multiplicative variance adjustment.
+\item Hartung Knapp Sidik Jonkman (HK) \citep{IntHoutIoannidis}.
+\item Random effects model (with REML estimate of the heterogeneity variance).
+\item Henmi and Copas (HC) \citep{henm:copa:10}.
+\item Harmonic mean analysis with alternative \texttt{none} \citep{Held2020b}
+  and without variance adjustment. % Check
+% \item Harmonic mean analysis with alternative {\texttt two.sided}
+%  \cite{Held2020b} % This was also thrown out
+\item Harmonic mean analysis with alternative \texttt{none}, additive variance
+  adjustment with $\hat \tau^2$. An extension of the idea in \citet{Held2020b}. 
+\item Harmonic mean analysis with alternative \texttt{none}, multiplicative
+  variance adjustment \citep{mawd:etal:17}.
+\item $k$-trials rule with alternative \texttt{none} and without
+  variance adjustment.
+\item $k$-trials rule with alternative \texttt{none}, additive variance
+  adjustment with $\hat \tau^2$. 
+\item $k$-trials rule with alternative \texttt{none}, multiplicative variance
+  adjustment.
 \end{enumerate}
 
 \subsection{Definition of the $k$-trials rule} \label{sec:ktrial}
 
-Similar to the harmonic mean method, the $k$-trials rule takes a mean value under the null hypothesis $\mu_{0}$ as well as effect estimates $\hat{\theta_{i}}, i = 1, \dots, k$ and the corresponding standard errors $\text{se}(\hat{\theta_i})$ from $k$ different studies as input and calculates the resulting $p$-value according to Equation~\ref{f:ktrial}.
+Similar to the harmonic mean method, the $k$-trials rule takes a mean value
+under the null hypothesis $\mu_{0}$ as well as effect estimates
+$\hat{\theta_{i}}, i = 1, \dots, k$ and the corresponding standard errors
+$\text{se}(\hat{\theta_i})$ from $k$ different studies as input and calculates
+the resulting $p$-value according to Equation~\ref{f:ktrial}.
 
 \begin{equation}\label{f:ktrial}
-p(\mu_0) = \text{max} \left( \Phi \left( \frac{\hat{\theta_i} - \mu_0}{\text{se}(\hat{\theta_{i}})} \right) \right)^k
+p(\mu_0) = \text{max} \left( 
+  \Phi \left( \frac{\hat{\theta_i} - \mu_0}{\text{se}(\hat{\theta_{i}})} \right)
+  \right)^k
 \end{equation}
 
-As the effect estimates $\hat{\theta_i}$ and the corresponding standard errors $\text{se}(\hat{\theta_i})$ are usually given in the context of meta-analyses, the above $p$-value function only depends on $\mu_{0}$. Therefore, CI limits are computed by searching for those values of $\mu_0$ for which $p(\mu_0) = 0.05$. This may result in confidence sets containing more than one confidence interval. 
+As the effect estimates $\hat{\theta_i}$ and the corresponding standard
+errors $\text{se}(\hat{\theta_i})$ are usually given in the context of
+meta-analyses, the above $p$-value function only depends on $\mu_{0}$.
+Therefore, CI limits are computed by searching for those values of $\mu_0$ for
+which $p(\mu_0) = 0.05$. This may result in confidence sets containing more
+than one confidence interval. 
 
-In case of variance adjustments, the term $\text{se}(\hat{\theta_i})$  in Equation~\ref{f:ktrial} is replaced with $\text{se}_{\text{adj}}(\hat{\theta_i})$, which is defined in Subsection~\ref{sec:varadj}.
+In case of variance adjustments, the term $\text{se}(\hat{\theta_i})$  in
+Equation~\ref{f:ktrial} is replaced with
+$\text{se}_{\text{adj}}(\hat{\theta_i})$, which is defined in
+Subsection~\ref{sec:varadj}.
 
 \subsection{Definition of the variance adjustments} \label{sec:varadj}
 
-As stated in Subsection~\ref{sec:method}, the harmonic mean and $k$-trials methods can be extended such that heterogeneity between the individual studies is taken into account. In scenarios where the additive variance adjustment is used, we estimate the between study variance $\tau^2$ using the REML method implemented in the \texttt{metagen} \texttt{R}-package ``meta'' and adjust the study-specific standard errors such that $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
+As stated in Subsection~\ref{sec:method}, the harmonic mean and $k$-trials
+methods can be extended such that heterogeneity between the individual studies
+is taken into account. In scenarios where the additive variance adjustment is
+used, we estimate the between study variance $\tau^2$ using the REML method
+implemented in the \texttt{metagen} \texttt{R}-package ``meta'' and adjust
+the study-specific standard errors such that
+$\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
 
-In case of the multiplicative variance adjustment, we estimate the multiplicative parameter $\phi$ as described in \citet{mawd:etal:17} and adjust the study-specific standard errors such that $\text{se}_{\text{adj}}(\hat{\theta_i}) = \text{se}(\hat{\theta_i}) \cdot \sqrt{\phi}$.
+In case of the multiplicative variance adjustment, we estimate the
+multiplicative parameter $\phi$ as described in \citet{mawd:etal:17} and adjust
+the study-specific standard errors such that
+$\text{se}_{\text{adj}}(\hat{\theta_i}) = \text{se}(\hat{\theta_i}) \cdot \sqrt{\phi}$.
 
 \subsection{Measures considered} \label{sec:meas}
 
 We assess the CIs using the following criteria
-  \begin{enumerate}
-  \item CI coverage of combined effect, \ie, the proportion of intervals containing the true effect % coverage_true
-  \item CI coverage of study effects, \ie, the proportion of intervals containing the true study-specific effects % coverage_effects
-  \item CI coverage of all study effects, \ie, whether or not the CI covers all of the study effects %coverage_all
-  \item CI coverage of at least one of the study effects, \ie, whether or not the CI covers at least one of the study effects % coverage_effects_min1
-  \item Prediction Interval (PI) coverage, \ie, the proportion of intervals containing the treatment effect of a newly simulated study. The newly simulated study has $n = 50$ and is not subject to publication bias. All other simulation parameters stay the same as for the simulation of the original studies (only for Harmonic mean, $k$-trials, REML, and HK methods) % coverage_prediction
-  \item CI width (Corresponds to the sum the width of the individual intervals in case of more than one interval)%width
+\begin{enumerate}
+  \item CI coverage of combined effect, \ie, the proportion of intervals
+    containing the true effect % coverage_true
+  \item CI coverage of study effects, \ie, the proportion of intervals
+    containing the true study-specific effects % coverage_effects
+  \item CI coverage of all study effects, \ie, whether or not the CI covers
+    all of the study effects %coverage_all
+  \item CI coverage of at least one of the study effects, \ie, whether or not
+    the CI covers at least one of the study effects % coverage_effects_min1
+  \item Prediction Interval (PI) coverage, \ie, the proportion of intervals
+    containing the treatment effect of a newly simulated study. The newly
+    simulated study has $n = 50$ and is not subject to publication bias. All
+    other simulation parameters stay the same as for the simulation of the
+    original studies (only for Harmonic mean, $k$-trials, REML, and HK methods)
+    % coverage_prediction
+  \item CI width (Corresponds to the sum the width of the individual intervals
+    in case of more than one interval)%width
   \item Interval score \citep{Gnei:Raft:07} % score
   \item Number of CIs (only for Harmonic mean and $k$-trials methods). % n
-  \end{enumerate}
+\end{enumerate}
 
 \vspace*{.5cm}
 
-For the Harmonic mean and $k$-trials methods, we also investigate the distribution of the lowest value of the $p$-value function between the lowest and the highest treatment effect of the simulated studies. In order to do so, we calculate the following measures:
+For the Harmonic mean and $k$-trials methods, we also investigate the
+distribution of the lowest value of the $p$-value function between the lowest
+and the highest treatment effect of the simulated studies. In order to do so,
+we calculate the following measures:
 \begin{itemize}
 \item Minimum
 \item First quartile
@@ -257,13 +354,29 @@ For the Harmonic mean and $k$-trials methods, we also investigate the distributi
 
 \vspace*{.5cm}
 
-As both methods, harmonic mean and $k$-trials, can result in more than one CI for a given meta-analysis, we record the relative frequency of the number of intervals $m$ over the 10'000 iterations for each of the different scenarios mentioned in Section~\ref{sec:scenario}. However, we truncate the distribution by summarising all events where the number of intervals is $> 9$.
+As both methods, harmonic mean and $k$-trials, can result in more than one
+CI for a given meta-analysis, we record the relative frequency of the number
+of intervals $m$ over the 10'000 iterations for each of the different scenarios
+mentioned in Section~\ref{sec:scenario}. However, we truncate the distribution
+by summarising all events where the number of intervals is $> 9$.
 
-\section{Estimates to be stored for each simulation and summary measures to be calculated over all simulations}
-For each simulated meta-analysis we construct CIs according to all methods (Section~\ref{sec:method}) and calculate all available assessments (Section~\ref{sec:meas}) for the respective method. For assessments 1-8 in Subsection~\ref{sec:meas} we only store the mean value of all the 10'000 iterations in a specific scenario. Regarding the distribution of the lowest value of the $p$-value function, we store the summary measures mentioned in the respective paragraph of Subsection~\ref{sec:meas}. We calculate the relative frequencies of the number of intervals $m=1, 2, \ldots, 9, >9$ in each confidence set over the 10'000 iterations of the same scenario.
+\section{
+  Estimates to be stored for each simulation and summary measures to
+  be calculated over all simulations
+}
+For each simulated meta-analysis we construct CIs according to all methods
+(Section~\ref{sec:method}) and calculate all available assessments
+(Section~\ref{sec:meas}) for the respective method. For assessments 1-8 in
+Subsection~\ref{sec:meas} we only store the mean value of all the 10'000
+iterations in a specific scenario. Regarding the distribution of the lowest
+value of the $p$-value function, we store the summary measures mentioned in
+the respective paragraph of Subsection~\ref{sec:meas}. We calculate the relative
+frequencies of the number of intervals $m=1, 2, \ldots, 9, >9$ in each
+confidence set over the 10'000 iterations of the same scenario.
 
 \section{Presentation of the simulation results}
-For each of the performance measures 1-8 in Subsection~\ref{sec:meas} we construct plots with
+For each of the performance measures 1-8 in Subsection~\ref{sec:meas} we
+construct plots with
 
 \begin{itemize}
 \item the number of studies $k$ on the $x$-axis
@@ -272,7 +385,8 @@ For each of the performance measures 1-8 in Subsection~\ref{sec:meas} we constru
 \item one panel for each CI method
 \end{itemize}
 
-Regarding the distribution of the $p$-value function for the harmonic mean and $k$-trials methods, we will create plots that contain
+Regarding the distribution of the $p$-value function for the harmonic mean
+and $k$-trials methods, we will create plots that contain
 \begin{itemize}
 \item the number of studies $k$ on the $x$-axis
 \item the value of the summary statistic on the $y$-axis
@@ -282,9 +396,11 @@ Regarding the distribution of the $p$-value function for the harmonic mean and $
 
 The plots for the relative frequencies of the number of intervals have
 \begin{itemize}
-\item the category ($1$ to $9$ and $>9$) indicating the number of intervals $n$ on the $x$-axis
+\item the category ($1$ to $9$ and $>9$) indicating the number of intervals
+  $n$ on the $x$-axis
 \item the relative frequency on the $y$-axis
-\item a bar for each category indicating the relative frequency for the respective category
+\item a bar for each category indicating the relative frequency for the
+  respective category
 \item one panel for each CI method
 \end{itemize}
 
