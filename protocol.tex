@@ -103,7 +103,7 @@ measures defined in Section~\ref{sec:meas}.
 We expect no failures, \ie, for all simulated data sets all type of CI methods
 should lead to a valid CI and all valid CIs should lead to valid CI criteria.
 If a failure occurs, we stop the simulation and investigate the reason for the
-failure. 
+failure.
 
 \subsection{Software to perform simulations}
 The simulation study is performed using the statistical software R \citep{R}.
@@ -117,11 +117,11 @@ and reproducible.
 
 
 \subsection{Scenarios to be investigated} \label{sec:scenario}
-The $720$ \todo{update number} simulated scenarios consist of all combinations
+The $720$ simulated scenarios consist of all combinations
 of the following parameters:
 \begin{itemize}
 \item Higgin's $I^2$ heterogeneity measure $\in \{0, 0.3, 0.6, 0.9\}$.
-\item We always use an additive heterogeneity model. \todo{Maybe remove this entirely?}
+% \item We always use an additive heterogeneity model. \todo{Maybe remove this entirely?}
 \item Number of studies summarized by the meta-analysis $k \in \{3, 5, 10, 20, 50\}$.
 \item Publication bias is  $\in \{\text{'none'}, \text{'moderate'}, \text{'strong'}\}$
   following the terminology of \citet{henm:copa:10}. 
@@ -214,8 +214,7 @@ number of studies is simulated.
 To obtain a similar scenario as in \citet{henm:copa:10} we set
 $$
 \theta / \sqrt{2/n_i}  \overset{!}{=} 1 \Rightarrow \theta = \sqrt{2/n_i}
-\vadjust{\todo{Where does this come from? Does this still apply when $\theta =
-0.5$?}}
+\vadjust{\todo{Where does this come from?}}
 $$
 However, we assume that only small studies with $n_i = 50$ are subject to
 publication bias. Thus, larger studies with $n_i = 500$ are always accepted.
@@ -253,96 +252,95 @@ use in order to compare the different CIs with each other.
 For this project, we will calculate 95\% CIs according to the following methods.
 
 \begin{enumerate}
-\item Hartung Knapp Sidik Jonkman (HK) \citep{IntHoutIoannidis}.
-\item Random effects model (with REML estimate of the heterogeneity variance).
-\item Henmi and Copas (HC) \citep{henm:copa:10}.
-\item Harmonic mean analysis with alternative \texttt{none} \citep{Held2020b}
-  and without variance adjustment. % Check
-% \item Harmonic mean analysis with alternative {\texttt two.sided}
-%  \cite{Held2020b} % This was also thrown out
-\item Harmonic mean analysis with alternative \texttt{none}, additive variance
-  adjustment with $\hat \tau^2$. An extension of the idea in \citet{Held2020b}. 
-\item Harmonic mean analysis with alternative \texttt{none}, multiplicative
-  variance adjustment \citep{mawd:etal:17}.
-\item $k$-trials rule with alternative \texttt{none} and without
-  variance adjustment.
-\item $k$-trials rule with alternative \texttt{none}, additive variance
-  adjustment with $\hat \tau^2$. 
-\item $k$-trials rule with alternative \texttt{none}, multiplicative variance
-  adjustment.
+  \item Hartung Knapp Sidik Jonkman (HK) \citep{IntHoutIoannidis}.
+  \item Random effects model.
+  \item Henmi and Copas (HC) \citep{henm:copa:10}.
+  \item Bayesian random effects meta analysis (Bayesmeta) with half-normal prior
+    distribution with $\sigma = 0.3$ \citep{rov:20, }.
+    \todo{Insert citation for Lilienthal et al. for $\sigma = 0.3$?}
+  \item Edgington's method \citep{edgington:72}.
+  \item Fisher's method \citep{fisher:34}.
 \end{enumerate}
-
-\subsection{Definition of the $k$-trials rule} \label{sec:ktrial}
-
-Similar to the harmonic mean method, the $k$-trials rule takes a mean value
-under the null hypothesis $\mu_{0}$ as well as effect estimates
-$\hat{\theta_{i}}, i = 1, \dots, k$ and the corresponding standard errors
-$\text{se}(\hat{\theta_i})$ from $k$ different studies as input and calculates
-the resulting $p$-value according to Equation~\ref{f:ktrial}.
-
-\begin{equation}\label{f:ktrial}
-p(\mu_0) = \text{max} \left( 
-  \Phi \left( \frac{\hat{\theta_i} - \mu_0}{\text{se}(\hat{\theta_{i}})} \right)
-  \right)^k
-\end{equation}
-
-As the effect estimates $\hat{\theta_i}$ and the corresponding standard
-errors $\text{se}(\hat{\theta_i})$ are usually given in the context of
-meta-analyses, the above $p$-value function only depends on $\mu_{0}$.
-Therefore, CI limits are computed by searching for those values of $\mu_0$ for
-which $p(\mu_0) = 0.05$. This may result in confidence sets containing more
-than one confidence interval. 
-
-In case of variance adjustments, the term $\text{se}(\hat{\theta_i})$  in
-Equation~\ref{f:ktrial} is replaced with
-$\text{se}_{\text{adj}}(\hat{\theta_i})$, which is defined in
-Subsection~\ref{sec:varadj}.
 
 \subsection{Definition of the variance adjustments} \label{sec:varadj}
 
-As stated in Subsection~\ref{sec:method}, the harmonic mean and $k$-trials
-methods can be extended such that heterogeneity between the individual studies
-is taken into account. In scenarios where the additive variance adjustment is
-used, we estimate the between study variance $\tau^2$ using the REML method
-implemented in the \texttt{metagen} \texttt{R}-package ``meta'' and adjust
-the study-specific standard errors such that
+As we assume an additive heterogeneity model, we will calculate the confidence
+intervals for methods \emph{Fisher}, \emph{Edgington}, and \emph{Random effects}
+based on the following estimators for the between-study variance $\tau^2$. The
+estimator acts thus as an additional scenario that is only applied to the above
+mentioned methods.
+
+\begin{enumerate}
+  \item No heterogeneity, \ie $\tau^2 = 0$.
+  \item DerSimonian-Laird \citep{ders:lair:86}.
+  \item Paule-Mandel.
+  \item REML.
+\end{enumerate}
+\todo{Add citation for these estimators?}
+
+The calculation of the estimates in the simulation will be done using the
+\texttt{metagen} function from the \texttt{R} package ``\emph{meta}''.
+
+The adjusted study-specific standard errors are then given by
 $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
 
-In case of the multiplicative variance adjustment, we estimate the
-multiplicative parameter $\phi$ as described in \citet{mawd:etal:17} and adjust
-the study-specific standard errors such that
-$\text{se}_{\text{adj}}(\hat{\theta_i}) = \text{se}(\hat{\theta_i}) \cdot \sqrt{\phi}$.
+% As stated in Subsection~\ref{sec:method}, the harmonic mean and $k$-trials
+% methods can be extended such that heterogeneity between the individual studies
+% is taken into account. In scenarios where the additive variance adjustment is
+% used, we estimate the between study variance $\tau^2$ using the REML method
+% implemented in the \texttt{metagen} \texttt{R}-package ``meta'' and adjust
+% the study-specific standard errors such that
+% $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
+% In case of the multiplicative variance adjustment, we estimate the
+% multiplicative parameter $\phi$ as described in \citet{mawd:etal:17} and adjust
+% the study-specific standard errors such that
+% $\text{se}_{\text{adj}}(\hat{\theta_i}) = \text{se}(\hat{\theta_i}) \cdot \sqrt{\phi}$.
 
 \subsection{Measures considered} \label{sec:meas}
 
 We assess the CIs using the following criteria
 \begin{enumerate}
   \item CI coverage of combined effect, \ie, the proportion of intervals
-    containing the true effect % coverage_true
-  \item CI coverage of study effects, \ie, the proportion of intervals
-    containing the true study-specific effects % coverage_effects
-  \item CI coverage of all study effects, \ie, whether or not the CI covers
-    all of the study effects %coverage_all
-  \item CI coverage of at least one of the study effects, \ie, whether or not
-    the CI covers at least one of the study effects % coverage_effects_min1
-  \item Prediction Interval (PI) coverage, \ie, the proportion of intervals
-    containing the treatment effect of a newly simulated study. The newly
-    simulated study has $n = 50$ and is not subject to publication bias. All
-    other simulation parameters stay the same as for the simulation of the
-    original studies (only for Harmonic mean, $k$-trials, REML, and HK methods)
-    % coverage_prediction
-  \item CI width (Corresponds to the sum the width of the individual intervals
-    in case of more than one interval)%width
-  \item Interval score \citep{Gnei:Raft:07} % score
-  \item Number of CIs (only for Harmonic mean and $k$-trials methods). % n
+    containing the true effect. If the CI does not exist given a specific
+    simulated data set, we treat the coverage as as missing (\texttt{NA}).
+    % coverage_true
+  % \item CI coverage of study effects, \ie, the proportion of intervals
+  %   containing the true study-specific effects % coverage_effects
+  % \item CI coverage of all study effects, \ie, whether or not the CI covers
+  %   all of the study effects %coverage_all
+  % \item CI coverage of at least one of the study effects, \ie, whether or not
+  %   the CI covers at least one of the study effects % coverage_effects_min1
+  % \item Prediction Interval (PI) coverage, \ie, the proportion of intervals
+  %   containing the treatment effect of a newly simulated study. The newly
+  %   simulated study has $n = 50$ and is not subject to publication bias. All
+  %   other simulation parameters stay the same as for the simulation of the
+  %   original studies (only for Harmonic mean, $k$-trials, REML, and HK methods)
+  %   % coverage_prediction
+  \item CI width. If there is more than one interval, the width is the sum of
+    the lengths of the individual intervals. If the interval does not exist for
+    a simulated data set, the width will be recorded as missing (\texttt{NA}).
+    %width
+  \item Interval score \citep{Gnei:Raft:07}. If the interval does not exist for
+    a simulated data set, the score will be recorded as missing (\texttt{NA}).
+    % score
+  \item Number of CIs (only for Fisher and Edgington methods). If the interval
+  does not exist for a simulated data set, the number of CIs will be recorded as
+  0. % n
+\end{enumerate}
+
+Furthermore, we calculate the following measure related to the point estimates
+
+\begin{enumerate}
+  \item Mean squared error (MSE).
 \end{enumerate}
 
 \vspace*{.5cm}
 
-For the Harmonic mean and $k$-trials methods, we also investigate the
-distribution of the lowest value of the $p$-value function between the lowest
+For the Edgington and Fisher methods, we also investigate the
+distribution of the highest value of the $p$-value function between the lowest
 and the highest treatment effect of the simulated studies. In order to do so,
 we calculate the following measures:
+
 \begin{itemize}
 \item Minimum
 \item First quartile
@@ -354,10 +352,10 @@ we calculate the following measures:
 
 \vspace*{.5cm}
 
-As both methods, harmonic mean and $k$-trials, can result in more than one
-CI for a given meta-analysis, we record the relative frequency of the number
-of intervals $m$ over the 10'000 iterations for each of the different scenarios
-mentioned in Section~\ref{sec:scenario}. However, we truncate the distribution
+As both methods can result in more than one CI for a given meta-analysis,
+we record the relative frequency of the number of intervals $m$ over the
+10'000 iterations for each of the different scenarios mentioned in
+Section~\ref{sec:scenario}. However, we truncate the distribution
 by summarising all events where the number of intervals is $> 9$.
 
 \section{
@@ -366,17 +364,18 @@ by summarising all events where the number of intervals is $> 9$.
 }
 For each simulated meta-analysis we construct CIs according to all methods
 (Section~\ref{sec:method}) and calculate all available assessments
-(Section~\ref{sec:meas}) for the respective method. For assessments 1-8 in
+(Section~\ref{sec:meas}) for the respective method. For assessments 1-3 in
 Subsection~\ref{sec:meas} we only store the mean value of all the 10'000
-iterations in a specific scenario. Regarding the distribution of the lowest
-value of the $p$-value function, we store the summary measures mentioned in
-the respective paragraph of Subsection~\ref{sec:meas}. We calculate the relative
-frequencies of the number of intervals $m=1, 2, \ldots, 9, >9$ in each
+iterations in a specific scenario. Possible missing values (\texttt{NA}) are
+removed before calculating the mean value. Regarding the distribution of the
+highest value of the $p$-value function, we store the summary measures mentioned
+in the respective paragraph of Subsection~\ref{sec:meas}. We calculate the
+relative frequencies of the number of intervals $m=1, 2, \ldots, 9, >9$ in each
 confidence set over the 10'000 iterations of the same scenario.
 
 \section{Presentation of the simulation results}
-For each of the performance measures 1-8 in Subsection~\ref{sec:meas} we
-construct plots with
+For each of the performance measures 1-3 in Subsection~\ref{sec:meas} as well as
+the mean squared error (MSE) we construct plots with
 
 \begin{itemize}
 \item the number of studies $k$ on the $x$-axis
