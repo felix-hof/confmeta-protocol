@@ -69,8 +69,8 @@
 \begin{document}
 \begin{center}
   {\noindent \LARGE \bf Simulation protocol:\\[2mm]
-    Comparison of confidence intervals summarizing the\\[2mm]
-    uncertainty of the combined estimate of a meta-analysis
+    Comparison of confidence intervals summarizing\\[2mm]
+    the uncertainty of the combined estimate of a meta-analysis
   }\\
 \bigskip
 {\noindent \Large Leonhard Held, Felix Hofmann
@@ -90,12 +90,12 @@ The simulation is implemented in \texttt{simulate\_all.R}.
 
 The aim of this simulation study is the comparison of confidence intervals
 (CIs) summarizing the uncertainty of the combined estimate of a meta-analysis.
-Specifically, we focus on CIs constructed using p-value functions that
-implement the methods from \citet{edgington:72} and \citet{fisher:34}. The
-underlying data sets are simulated as described in Section~\ref{sec:simproc}
-and Section~\ref{sec:scenario}. The resulting intervals are then compared to CIs
-constructed using the other methods listed in Section~\ref{sec:method} using the
-measures defined in Section~\ref{sec:meas}.
+Specifically, we focus on CIs constructed using $p$-value functions that
+implement the $p$-value combination methods from \citet{edgington:72} and
+\citet{fisher:34}. The underlying data sets are simulated as described in
+Section~\ref{sec:simproc}. In Section~\ref{sec:analysis} we describe which
+CI construction methods we compare in this simulation study and what criteria
+we use to evaluate them.
 
 \section{Simulation of the data sets} \label{sec:simproc}
 
@@ -211,14 +211,10 @@ and $\text{se}_i$ by newly simulated values, which are then again accepted
 with the given probability above. This procedure is repeated until the required
 number of studies is simulated. 
 
-To obtain a similar scenario as in \citet{henm:copa:10} we set
-$$
-\theta / \sqrt{2/n_i}  \overset{!}{=} 1 \Rightarrow \theta = \sqrt{2/n_i}
-\vadjust{\todo{Where does this come from?}}
-$$
 However, we assume that only small studies with $n_i = 50$ are subject to
 publication bias. Thus, larger studies with $n_i = 500$ are always accepted.
-As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.2, 0.5\}$. See the R function \texttt{simREbias()}.
+As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.2, 0.5\}$.
+See the R function \texttt{simREbias()}.
 
 % The mean study effect $\theta$ and the sample size $n_i$ have an influence
 % on the acceptance probability 
@@ -241,7 +237,7 @@ For each scenario in Section~\ref{sec:scenario} we
   Section~\ref{sec:meas}
 \end{enumerate}
 
-\section{Analysis of the confidence intervals}
+\section{Analysis of the confidence intervals} \label{sec:analysis}
 
 This section contains an overview over the construction methods for CIs
 that we consider in this simulation. Moreover, we explain what measures we
@@ -252,12 +248,12 @@ use in order to compare the different CIs with each other.
 For this project, we will calculate 95\% CIs according to the following methods.
 
 \begin{enumerate}
-  \item Hartung Knapp Sidik Jonkman (HK) \citep{IntHoutIoannidis}.
+  \item Hartung-Knapp-Sidik-Jonkman (HK) \citep{IntHoutIoannidis}.
   \item Random effects model.
   \item Henmi and Copas (HC) \citep{henm:copa:10}.
   \item Bayesian random effects meta analysis (Bayesmeta) with half-normal prior
-    distribution with $\sigma = 0.3$ \citep{rov:20, }.
-    \todo{Insert citation for Lilienthal et al. for $\sigma = 0.3$?}
+    distribution with scale parameter $\sigma = 0.3$ for $\tau$, the square root
+    between-study heterogeneity  \citep{rov:20, lil:2023}.
   \item Edgington's method \citep{edgington:72}.
   \item Fisher's method \citep{fisher:34}.
 \end{enumerate}
@@ -273,10 +269,9 @@ mentioned methods.
 \begin{enumerate}
   \item No heterogeneity, \ie $\tau^2 = 0$.
   \item DerSimonian-Laird \citep{ders:lair:86}.
-  \item Paule-Mandel.
-  \item REML.
+  \item Paule-Mandel \citep{paul:man:82}.
+  \item REML \citep{harv:77}.
 \end{enumerate}
-\todo{Add citation for these estimators?}
 
 The calculation of the estimates in the simulation will be done using the
 \texttt{metagen} function from the \texttt{R} package ``\emph{meta}''.

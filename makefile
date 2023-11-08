@@ -1,9 +1,9 @@
 all: protocol.pdf
 
-protocol.pdf: protocol.tex
+protocol.pdf: protocol.tex biblio.bib
 	latexmk -pdf $<
 
-preview: protocol.tex
+preview: protocol.tex biblio.bib
 	latexmk -pdf -pvc $<
 
 clean:
