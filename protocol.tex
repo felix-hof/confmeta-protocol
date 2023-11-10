@@ -111,9 +111,9 @@ We save the output of \texttt{sessionInfo()} giving information on the used
 version of R, packages, and platform with the simulation results.
 
 \subsection{Random number generator}
-We use the package \pkg{doRNG} with its default random number generator to
-ensure that random numbers generated inside parallel for loops are independent
-and reproducible.
+We use the package \pkg{doRNG} \todo{add citation} with its default random
+number generator to ensure that random numbers generated inside parallel
+for loops are independent and reproducible.
 
 
 \subsection{Scenarios to be investigated} \label{sec:scenario}
@@ -121,13 +121,10 @@ The $720$ simulated scenarios consist of all combinations
 of the following parameters:
 \begin{itemize}
 \item Higgin's $I^2$ heterogeneity measure $\in \{0, 0.3, 0.6, 0.9\}$.
-% \item We always use an additive heterogeneity model. \todo{Maybe remove this entirely?}
 \item Number of studies summarized by the meta-analysis $k \in \{3, 5, 10, 20, 50\}$.
 \item Publication bias is  $\in \{\text{'none'}, \text{'moderate'}, \text{'strong'}\}$
   following the terminology of \citet{henm:copa:10}. 
 \item The average study effect $\theta \in \{0.2, 0.5\}$. 
-  %, and we set it to $\theta = 0.2$ to
-  %obtain a similar scenario as used in \citet{henm:copa:10}.
 \item The distribution to draw the true study values $\delta_i$ is either
   'Gaussian' or 't' with 4 degrees of freedom. The latter still has finite mean
     and variance, but leads to more 'outliers'.
@@ -140,8 +137,6 @@ Note that \citet{IntHoutIoannidis} use a similar setup.
 
 \subsection{Simulation details}
 
-% For the \textbf{Additive heterogeneity model without publication bias}, the
-% simulation of one meta-analysis dataset is performed as follows:
 The simulation of one meta-analysis data set is performed as follows:
 
 \begin{enumerate}
@@ -170,34 +165,6 @@ The simulation of one meta-analysis data set is performed as follows:
 The marginal variance of this simulation procedure is
 $\tau^2 + 2/n_i$, so follows the additive heterogeneity model as intended.
 
-% For the \textbf{Multiplicative model without publication bias}, the simulation
-% of one meta-analysis dataset is performed as follows:
-% \begin{enumerate}
-% \item Compute the within-study variance
-%   $\epsilon^2 = \frac{2}{k} \sum\limits_{i=1}^k \frac{1}{n_i}$.
-%   \item Compute the multiplicative heterogeneity factor
-%     $\phi = \frac{1}{1-I^2}$. Compute the corresponding
-%     \begin{equation}\label{eq:eq2}
-%       \tau^2 = \epsilon^2 \, (\phi-1) .
-%     \end{equation}
-% \item For a trial $i$ of the meta-analysis with $k$ trials, $i = 1, \dots, k$:
-%   \begin{enumerate}
-%     \item Simulate the true effect size using the Gaussian model:
-%       $\delta_i \sim \N(\theta, \tau^2)$ or using a Student-$t$ distribution
-%       such that the samples have mean $\theta$ and variance $\tau^2$.
-%     \item Simulate the effect estimates of each trial
-%       $y_i \sim \N(\delta_i, \frac{2}{n_i})$.
-%     \item Simulate the standard errors of the trial outcomes:
-%       $\text{se}_i \sim \sqrt{\frac{\chi^2(2n_i-2)}{(n_i-1)n_i}}$.
-%   \end{enumerate}
-% \end{enumerate}
-%
-%
-% \paragraph{Note: The marginal variance}\mbox{}\\
-% The marginal variance of this simulation procedure is
-% $\frac{2}{n} \, (\phi-1) + \frac{2}{n} = \frac{2\phi}{n} = \phi \, \epsilon^2$,
-% so follows the multiplicative model as intended.
-
 \paragraph{Note: Publication bias}\mbox{}\\
 To simulate studies under \textbf{publication bias}, we follow the suggestion
 of \citet{henm:copa:10} and accept each simulated study with probability
@@ -215,18 +182,6 @@ However, we assume that only small studies with $n_i = 50$ are subject to
 publication bias. Thus, larger studies with $n_i = 500$ are always accepted.
 As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.2, 0.5\}$.
 See the R function \texttt{simREbias()}.
-
-% The mean study effect $\theta$ and the sample size $n_i$ have an influence
-% on the acceptance probability 
-
-% \paragraph{Note: Unbalanced sample sizes}\mbox{}\\
-% To study the effect of unbalanced sample sizes $n_1, \ldots, n_k$ we consider
-% the following setup:
-% \begin{enumerate}
-% \item Increase the sample size of \textbf{one} of the $k$ by a factor 10. 
-% \item Increase the sample size of \textbf{two} of the $k$ by a factor 10. 
-% \end{enumerate}
-%% See the argument \texttt{large} of \texttt{simREbias()}.
 
 \subsection{Simulation procedure}
 For each scenario in Section~\ref{sec:scenario} we
@@ -251,9 +206,6 @@ For this project, we will calculate 95\% CIs according to the following methods.
   \item Hartung-Knapp-Sidik-Jonkman (HK) \citep{IntHoutIoannidis}.
   \item Random effects model.
   \item Henmi and Copas (HC) \citep{henm:copa:10}.
-  \item Bayesian random effects meta analysis (Bayesmeta) with half-normal prior
-    distribution with scale parameter $\sigma = 0.3$ for $\tau$, the square root
-    between-study heterogeneity  \citep{rov:20, lil:2023}.
   \item Edgington's method \citep{edgington:72}.
   \item Fisher's method \citep{fisher:34}.
 \end{enumerate}
@@ -279,18 +231,6 @@ The calculation of the estimates in the simulation will be done using the
 The adjusted study-specific standard errors are then given by
 $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
 
-% As stated in Subsection~\ref{sec:method}, the harmonic mean and $k$-trials
-% methods can be extended such that heterogeneity between the individual studies
-% is taken into account. In scenarios where the additive variance adjustment is
-% used, we estimate the between study variance $\tau^2$ using the REML method
-% implemented in the \texttt{metagen} \texttt{R}-package ``meta'' and adjust
-% the study-specific standard errors such that
-% $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
-% In case of the multiplicative variance adjustment, we estimate the
-% multiplicative parameter $\phi$ as described in \citet{mawd:etal:17} and adjust
-% the study-specific standard errors such that
-% $\text{se}_{\text{adj}}(\hat{\theta_i}) = \text{se}(\hat{\theta_i}) \cdot \sqrt{\phi}$.
-
 \subsection{Measures considered} \label{sec:meas}
 
 We assess the CIs using the following criteria
@@ -298,19 +238,6 @@ We assess the CIs using the following criteria
   \item CI coverage of combined effect, \ie, the proportion of intervals
     containing the true effect. If the CI does not exist given a specific
     simulated data set, we treat the coverage as as missing (\texttt{NA}).
-    % coverage_true
-  % \item CI coverage of study effects, \ie, the proportion of intervals
-  %   containing the true study-specific effects % coverage_effects
-  % \item CI coverage of all study effects, \ie, whether or not the CI covers
-  %   all of the study effects %coverage_all
-  % \item CI coverage of at least one of the study effects, \ie, whether or not
-  %   the CI covers at least one of the study effects % coverage_effects_min1
-  % \item Prediction Interval (PI) coverage, \ie, the proportion of intervals
-  %   containing the treatment effect of a newly simulated study. The newly
-  %   simulated study has $n = 50$ and is not subject to publication bias. All
-  %   other simulation parameters stay the same as for the simulation of the
-  %   original studies (only for Harmonic mean, $k$-trials, REML, and HK methods)
-  %   % coverage_prediction
   \item CI width. If there is more than one interval, the width is the sum of
     the lengths of the individual intervals. If the interval does not exist for
     a simulated data set, the width will be recorded as missing (\texttt{NA}).
@@ -319,8 +246,8 @@ We assess the CIs using the following criteria
     a simulated data set, the score will be recorded as missing (\texttt{NA}).
     % score
   \item Number of CIs (only for Fisher and Edgington methods). If the interval
-  does not exist for a simulated data set, the number of CIs will be recorded as
-  0. % n
+    does not exist for a simulated data set, the number of CIs will be recorded as
+    0. % n
 \end{enumerate}
 
 Furthermore, we calculate the following measure related to the point estimates
