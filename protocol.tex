@@ -111,20 +111,20 @@ We save the output of \texttt{sessionInfo()} giving information on the used
 version of R, packages, and platform with the simulation results.
 
 \subsection{Random number generator}
-We use the package \pkg{doRNG} \todo{add citation} with its default random
+We use the package \pkg{doRNG} \citep{doRNG} with its default random
 number generator to ensure that random numbers generated inside parallel
 for loops are independent and reproducible.
 
 
 \subsection{Scenarios to be investigated} \label{sec:scenario}
-The $720$ simulated scenarios consist of all combinations
+The $1080$ simulated scenarios consist of all combinations
 of the following parameters:
 \begin{itemize}
 \item Higgin's $I^2$ heterogeneity measure $\in \{0, 0.3, 0.6, 0.9\}$.
 \item Number of studies summarized by the meta-analysis $k \in \{3, 5, 10, 20, 50\}$.
 \item Publication bias is  $\in \{\text{'none'}, \text{'moderate'}, \text{'strong'}\}$
   following the terminology of \citet{henm:copa:10}. 
-\item The average study effect $\theta \in \{0.2, 0.5\}$. 
+\item The average study effect $\theta \in \{0.1, 0.2, 0.5\}$. 
 \item The distribution to draw the true study values $\delta_i$ is either
   'Gaussian' or 't' with 4 degrees of freedom. The latter still has finite mean
     and variance, but leads to more 'outliers'.
@@ -180,7 +180,7 @@ number of studies is simulated.
 
 However, we assume that only small studies with $n_i = 50$ are subject to
 publication bias. Thus, larger studies with $n_i = 500$ are always accepted.
-As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.2, 0.5\}$.
+As described in Section~\ref{sec:scenario}, we set $\theta \in \{0.1, 0.2, 0.5\}$.
 See the R function \texttt{simREbias()}.
 
 \subsection{Simulation procedure}
@@ -226,7 +226,7 @@ mentioned methods.
 \end{enumerate}
 
 The calculation of the estimates in the simulation will be done using the
-\texttt{metagen} function from the \texttt{R} package ``\emph{meta}''.
+\texttt{metagen} function from the \texttt{R} package \pkg{meta} \citep{meta}.
 
 The adjusted study-specific standard errors are then given by
 $\text{se}_{\text{adj}}(\hat{\theta_i}) = \sqrt{\text{se}(\hat{\theta_i})^2 + \tau^2}$.
@@ -250,15 +250,24 @@ We assess the CIs using the following criteria
     0. % n
 \end{enumerate}
 
-Furthermore, we calculate the following measure related to the point estimates
+Furthermore, we calculate the following measure related to the point estimates.
 
 \begin{enumerate}
-  \item Mean squared error (MSE).
+  \item Mean squared error (MSE) of the estimator.
+  \item Bias of the estimator.
+  \item Variance of the estimator.
 \end{enumerate}
+
+\paragraph{Note: Uniqueness of the point estimate}\mbox{}\\
+As a point estimate for methods \emph{Edgington} and \emph{Fisher}, we use the
+value where the $p$-value function is maximal. However, this definition does not
+guarantee the uniqueness of a point estimate. As the computation of the above
+measures assumes unique point estimates, we record meta-analyses with more than
+one combined point estimates as missing (\texttt{NA}).
 
 \vspace*{.5cm}
 
-For the Edgington and Fisher methods, we also investigate the
+For the \emph{Edgington} and \emph{Fisher} methods, we also investigate the
 distribution of the highest value of the $p$-value function between the lowest
 and the highest treatment effect of the simulated studies. In order to do so,
 we calculate the following measures:
@@ -288,11 +297,20 @@ For each simulated meta-analysis we construct CIs according to all methods
 (Section~\ref{sec:method}) and calculate all available assessments
 (Section~\ref{sec:meas}) for the respective method. For assessments 1-3 in
 Subsection~\ref{sec:meas} we only store the mean value of all the 10'000
-iterations in a specific scenario. Possible missing values (\texttt{NA}) are
-removed before calculating the mean value. Regarding the distribution of the
+iterations in a specific scenario. Possible missing values (\texttt{NA})
+are removed before calculating the mean value. However, we also record the
+proportion of non-missing values in order to provide an overview over the number
+of observations used to calculate the mean.
+
+The measures related to the point estimates are calculated over the entire
+sample of the 10'000 iterations. Possible missing values (\texttt{NA}) are
+removed before the calculations. As for the confidence interval assessments, we
+also record the proportion of non-missing values.
+
+Regarding the distribution of the
 highest value of the $p$-value function, we store the summary measures mentioned
 in the respective paragraph of Subsection~\ref{sec:meas}. We calculate the
-relative frequencies of the number of intervals $m=1, 2, \ldots, 9, >9$ in each
+relative frequencies of the number of intervals $m=0, 1, \ldots, 9, >9$ in each
 confidence set over the 10'000 iterations of the same scenario.
 
 \section{Presentation of the simulation results}
